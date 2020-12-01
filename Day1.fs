@@ -28,3 +28,19 @@ module Exercise =
 
         Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you get if you multiply them together?
         "
+
+module Solution =
+    let puzzleInput = 
+        System.IO.File.ReadAllLines("./Puzzle1Input.txt")
+        |> Array.map (fun text -> int text)
+        |> List.ofArray
+        |> List.map (fun number -> number, 2020 - number)
+        |> List.unzip
+        |> fun (numbers, requiredNumbers) -> 
+            requiredNumbers 
+            |> List.map (fun reqNumber -> 
+                match List.contains reqNumber numbers with
+                | true -> Some reqNumber
+                | false -> None)
+            |> List.choose id
+            |> fun answer -> (*) answer.[0] answer.[1]
