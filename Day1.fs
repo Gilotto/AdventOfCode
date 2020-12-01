@@ -1,5 +1,5 @@
 namespace AdventOfCode
-module Exercise =
+module Exercise1 =
     let text = "
         --- Day 1: Report Repair ---
 
@@ -29,7 +29,7 @@ module Exercise =
         Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you get if you multiply them together?
         "
 
-module Solution =
+module Solution1 =
     let puzzleInput = 
         System.IO.File.ReadAllLines("./Puzzle1Input.txt")
         |> Array.map (fun text -> int text)
@@ -44,3 +44,36 @@ module Solution =
                 | false -> None)
             |> List.choose id
             |> fun answer -> (*) answer.[0] answer.[1]
+
+module Excercise2 =
+    let text = "
+    The Elves in accounting are thankful for your help; one of them even offers you a starfish coin they had left over from a past vacation. They offer you a second one if you can find three numbers in your expense report that meet the same criteria.
+
+    Using the above example again, the three entries that sum to 2020 are 979, 366, and 675. Multiplying them together produces the answer, 241861950.
+
+    In your expense report, what is the product of the three entries that sum to 2020?
+    "
+
+module Solution2 =
+    let input = ""
+        // System.IO.File.ReadAllLines("./Puzzle1Input.txt")
+        // |> Array.map (fun text -> int text)
+        // |> List.ofArray
+        // |> List.map (fun number -> number, 2020 - number)
+        // |> List.unzip
+        // |> fun (numbers, requiredNumbers) -> 
+        //     requiredNumbers
+        //     |> List.map (fun addedNumber -> addedNumber, numbers |> List.filter (fun number -> number < addedNumber )) 
+        //     |> List.map (fun (addedNumber,list) -> addedNumber,list, list)
+        //     |> List.map (fun (requiredNumber, numbersLessThanRequiredNumber, sameNumbers) ->
+        //         numbersLessThanRequiredNumber
+        //         |> List.map (fun number -> 
+        //             sameNumbers
+        //             |> List.filter (fun numberToExclude -> numberToExclude = number)
+        //             |> fun list -> match List.contains (requiredNumber - number) list with
+        //                             | true -> Some number
+        //                             | false -> None)
+        //             |> List.choose id
+        //             |> List.map (fun list -> match list with
+
+        //         )
