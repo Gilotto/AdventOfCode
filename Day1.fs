@@ -59,21 +59,23 @@ module Solution2 =
         System.IO.File.ReadAllLines("./Puzzle1Input.txt")
         |> Array.map (fun text -> int text)
         |> List.ofArray
-        // |> List.map (fun number -> number, 2020 - number)
-        // |> List.unzip
-        // |> fun (numbers, requiredNumbers) -> 
-        //     requiredNumbers
-        //     |> List.map (fun addedNumber -> addedNumber, numbers |> List.filter (fun number -> number < addedNumber )) 
-        //     |> List.map (fun (addedNumber,list) -> addedNumber,list, list)
-        //     |> List.map (fun (requiredNumber, numbersLessThanRequiredNumber, sameNumbers) ->
-        //         numbersLessThanRequiredNumber
-        //         |> List.map (fun number -> 
-        //             sameNumbers
-        //             |> List.filter (fun numberToExclude -> numberToExclude = number)
-        //             |> fun list -> match List.contains (requiredNumber - number) list with
-        //                             | true -> Some number
-        //                             | false -> None)
-        //             |> List.choose id
-        //             |> List.map (fun list -> match list with
 
-        //         )
+    let calculateAmountTo amount number = 
+        amount - number
+
+    let listofResultOfSecondAndThirdNumber =
+        List.map (calculateAmountTo 2020)
+
+    let findThirdNumberForThisNumber number =
+        List.map (fun amount -> calculateAmountTo number amount)
+
+    let solution =
+        input
+        |> listofResultOfSecondAndThirdNumber
+        |> List.map (fun number -> findThirdNumberForThisNumber number input)
+        |> List.map (fun list -> list |> List.filter (fun i -> i > 1))
+        |> List.map (fun list -> list |> List.map (fun numberToFind -> input |> List.tryFind (fun number -> number = numberToFind )))
+        |> List.map (fun list -> list |> List.choose id)
+        |> List.find (fun test -> test <> [])
+        |> fun list -> (calculateAmountTo 2020 (list |> List.reduce (+)))::list
+        |> List.reduce (*)
