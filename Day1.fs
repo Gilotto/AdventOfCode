@@ -55,10 +55,10 @@ module Excercise2 =
     "
 
 module Solution2 =
-    let input = ""
-        // System.IO.File.ReadAllLines("./Puzzle1Input.txt")
-        // |> Array.map (fun text -> int text)
-        // |> List.ofArray
+    let input =
+        System.IO.File.ReadAllLines("./Puzzle1Input.txt")
+        |> Array.map (fun text -> int text)
+        |> List.ofArray
         // |> List.map (fun number -> number, 2020 - number)
         // |> List.unzip
         // |> fun (numbers, requiredNumbers) -> 
