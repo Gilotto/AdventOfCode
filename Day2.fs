@@ -27,10 +27,37 @@ module Excercise1 =
         """
 
 module Solution1 =
+    type PasswordPolicy =
+        {
+            lowest:int
+            highest:int
+            letter:char
+            password:string
+        }
+    
     let puzzleInput = 
         System.IO.File.ReadAllLines("./Puzzle2Input.txt")
 
     let parseInputString (inputString:string) =
-        inputString.Split(' ')
-        |> fun array -> (array.[0],array.[1],array.[2])
+        inputString.Split([|' '; ':'; '-'|]) //{|1;3;a;abcde|} 
+        |> fun array -> 
+                    {
+            lowest = int array.[0]
+            highest = int array.[1]
+            letter = char array.[2]
+            password = string array.[4]
+            }
+
+    let checkNumber passwordPolicy =
+        match passwordPolicy.password |>  String.filter (fun char -> passwordPolicy.letter = char)|> String.length with
+        |number when number < passwordPolicy.lowest -> false
+        |number when number > passwordPolicy.highest -> false
+        |_ -> true
+
+    let solution1 =
+        puzzleInput
+        |> Array.map parseInputString
+        |> Array.map checkNumber
+        |> Array.countBy id
+
         
