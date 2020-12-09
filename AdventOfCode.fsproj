@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Day1.fs" />
-    <Content Include="Puzzle1Input.txt" />
     <Compile Include="Day2.fs" />
+    <Compile Include="Day3.fs" />
   </ItemGroup>
 </Project>
