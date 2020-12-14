@@ -54,30 +54,139 @@ Count the number of valid passports - those that have all required fields. Treat
 
 module Solution1 = 
 
+    let inline tryParseInt a =
+        try
+            a |> int |> Some
+        with 
+            | :? System.FormatException -> None
+            | :? System.OverflowException -> 
+                printfn "overflow exception %A" a
+                None
+
+    let inline tryParseDouble a =
+        try
+            a |> double |> Some
+        with 
+            | :? System.FormatException -> None
+            | :? System.OverflowException -> 
+                printfn "overflow exception %A" a
+                None
+                
+    type ValidatedPassport =
+        {
+            byr :int
+            iyr :int
+            eyr :int
+            hgt :string
+            hcl :string
+            ecl :string
+            pid :double
+            cid :int option
+        }  
+
+    type UnvalidatedPassport =
+        {
+            byr :int option
+            iyr :int option
+            eyr :int option
+            hgt :string option
+            hcl :string option
+            ecl :string option
+            pid :double option
+            cid :int option
+        }
+        static member Create = 
+            {
+                byr = None
+                iyr = None
+                eyr = None
+                hgt = None
+                hcl = None
+                ecl = None
+                pid = None
+                cid = None
+            }
+
     let puzzleInput = 
         System.IO.File.ReadAllLines("./Puzzle4Input.txt")
+        |> List.ofArray
 
-    let findCharinString (index, mapString:string) =
-        mapString.[(index - 1) % mapString.Length]
-    
-    let filterVertical slopeVertical input=
-        input
-        |> Array.indexed
-        |> Array.filter (fun (index, mapstring) -> (index % slopeVertical) = 0)
-        |> Array.map (fun (_,relevantMapstring) -> relevantMapstring)
+    let parseLine sep (line:string)  =
+        line.Split (sep)
+        |> List.ofArray
 
-    let solution1 input slopeHorizontal slopeVertical = 
-        input
-        |> filterVertical slopeVertical
-        |> Array.indexed
-        |> Array.map (fun (index,mapString) -> 1 + (index * slopeHorizontal), mapString) //index 0 corresponds to char 1, index 1 corresponds to char 1 + 1*3 =4 etc.
-        |> Array.map findCharinString
-        |> Array.map (fun char -> if char = '#' then true else false)
-        |> Array.countBy id
-        |> Array.filter (fun (yesOrNo , _) -> yesOrNo)
-        |> fun array -> array.[0] |> fun ( _ , number) -> number
-        |> fun answer -> 
-            printfn "Answer = %i; for slope Hor: %i; Ver: %i " answer slopeHorizontal slopeVertical
-            answer
+    let convertInputStringToPasswordField (inputString:string) (passport:UnvalidatedPassport) =
 
-    solution1 puzzleInput 3 1 |> ignore
+        let matchIdentifierToPassportField (passportToAddInfo:UnvalidatedPassport) (fieldString:string)  =
+            let (identifier,value) = 
+                match fieldString with
+                |string when string.Contains (':') -> fieldString |> parseLine ([|':'|]) |> fun array -> array.[0], array.[1]
+                |_ -> "", ""
+            match identifier with 
+            |"byr" -> {passportToAddInfo with byr = tryParseInt value} 
+            |"iyr" -> {passportToAddInfo with iyr = tryParseInt value} 
+            |"eyr" -> {passportToAddInfo with eyr = tryParseInt value} 
+            |"hgt" -> {passportToAddInfo with hgt = Some value} 
+            |"hcl" -> {passportToAddInfo with hcl = Some value} 
+            |"ecl" -> {passportToAddInfo with ecl = Some value} 
+            |"pid" -> {passportToAddInfo with pid = tryParseDouble value} 
+            |"cid" -> {passportToAddInfo with cid = tryParseInt value} 
+            | _ -> passportToAddInfo
+        inputString 
+        |> parseLine [|' '|]
+        |> List.fold matchIdentifierToPassportField passport
+
+    let convertinputToPassword inputStringList =
+        let rec parseInput inputList listOfUnvalidatedPassports passportSoFar  =
+            match inputList with
+            |inputString::tail when inputString = ""    -> parseInput tail (passportSoFar::listOfUnvalidatedPassports) UnvalidatedPassport.Create 
+            |inputString::tail                          -> parseInput tail listOfUnvalidatedPassports (convertInputStringToPasswordField inputString passportSoFar)
+            |[] -> passportSoFar::listOfUnvalidatedPassports
+
+        parseInput inputStringList List.empty UnvalidatedPassport.Create
+
+    let checkPassport passport :ValidatedPassport option=
+            match passport.byr,passport.iyr,passport.eyr,passport.hgt,passport.hcl,passport.ecl,passport.pid,passport.cid with
+            |(Some birthYear), 
+             (Some issueYear), 
+             (Some exYear), 
+             (Some height),
+             (Some hairColor),
+             (Some eyeColor),
+             (Some passID),
+             (Some countryID) -> 
+                {
+                    ValidatedPassport.byr = birthYear
+                    ValidatedPassport.iyr = issueYear
+                    ValidatedPassport.eyr = exYear
+                    ValidatedPassport.hgt = height
+                    ValidatedPassport.hcl = hairColor
+                    ValidatedPassport.ecl = eyeColor
+                    ValidatedPassport.pid = passID
+                    ValidatedPassport.cid = countryID |> Some
+                } |> Some //Valid Passport
+            |(Some birthYear), 
+             (Some issueYear), 
+             (Some exYear), 
+             (Some height),
+             (Some hairColor),
+             (Some eyeColor),
+             (Some passID),
+             (None) -> 
+                {
+                    ValidatedPassport.byr = birthYear
+                    ValidatedPassport.iyr = issueYear
+                    ValidatedPassport.eyr = exYear
+                    ValidatedPassport.hgt = height
+                    ValidatedPassport.hcl = hairColor
+                    ValidatedPassport.ecl = eyeColor
+                    ValidatedPassport.pid = passID
+                    ValidatedPassport.cid = None
+                } |> Some //Hacked valid Passport
+            | _ , _ , _ , _ , _ , _ , _, _ -> None //Invalid Passport
+
+    let solution1 =  
+                puzzleInput
+                |> convertinputToPassword
+                |> List.map checkPassport
+                |> List.countBy (fun passport -> passport.IsSome)                     
