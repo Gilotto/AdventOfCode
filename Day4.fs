@@ -58,20 +58,24 @@ module Solution1 =
         try
             a |> int |> Some
         with 
-            | :? System.FormatException -> None
+            | :? System.FormatException -> 
+                printfn "format exception %A" a
+                Some 1
             | :? System.OverflowException -> 
                 printfn "overflow exception %A" a
-                None
-
+                Some 1
+                
     let inline tryParseDouble a =
         try
             a |> double |> Some
         with 
-            | :? System.FormatException -> None
+            | :? System.FormatException -> 
+                printfn "format exception %A" a
+                Some 1.
             | :? System.OverflowException -> 
                 printfn "overflow exception %A" a
-                None
-                
+                Some 1.
+
     type ValidatedPassport =
         {
             byr :int
@@ -146,47 +150,47 @@ module Solution1 =
         parseInput inputStringList List.empty UnvalidatedPassport.Create
 
     let checkPassport passport :ValidatedPassport option=
-            match passport.byr,passport.iyr,passport.eyr,passport.hgt,passport.hcl,passport.ecl,passport.pid,passport.cid with
-            |(Some birthYear), 
-             (Some issueYear), 
-             (Some exYear), 
-             (Some height),
-             (Some hairColor),
-             (Some eyeColor),
-             (Some passID),
-             (Some countryID) -> 
-                {
-                    ValidatedPassport.byr = birthYear
-                    ValidatedPassport.iyr = issueYear
-                    ValidatedPassport.eyr = exYear
-                    ValidatedPassport.hgt = height
-                    ValidatedPassport.hcl = hairColor
-                    ValidatedPassport.ecl = eyeColor
-                    ValidatedPassport.pid = passID
-                    ValidatedPassport.cid = countryID |> Some
-                } |> Some //Valid Passport
-            |(Some birthYear), 
-             (Some issueYear), 
-             (Some exYear), 
-             (Some height),
-             (Some hairColor),
-             (Some eyeColor),
-             (Some passID),
-             (None) -> 
-                {
-                    ValidatedPassport.byr = birthYear
-                    ValidatedPassport.iyr = issueYear
-                    ValidatedPassport.eyr = exYear
-                    ValidatedPassport.hgt = height
-                    ValidatedPassport.hcl = hairColor
-                    ValidatedPassport.ecl = eyeColor
-                    ValidatedPassport.pid = passID
-                    ValidatedPassport.cid = None
-                } |> Some //Hacked valid Passport
-            | _ , _ , _ , _ , _ , _ , _, _ -> None //Invalid Passport
+        match passport.byr,passport.iyr,passport.eyr,passport.hgt,passport.hcl,passport.ecl,passport.pid,passport.cid with
+        |(Some birthYear), 
+         (Some issueYear), 
+         (Some exYear), 
+         (Some height),
+         (Some hairColor),
+         (Some eyeColor),
+         (Some passID),
+         (Some countryID) -> 
+            {
+                ValidatedPassport.byr = birthYear
+                ValidatedPassport.iyr = issueYear
+                ValidatedPassport.eyr = exYear
+                ValidatedPassport.hgt = height
+                ValidatedPassport.hcl = hairColor
+                ValidatedPassport.ecl = eyeColor
+                ValidatedPassport.pid = passID
+                ValidatedPassport.cid = countryID |> Some
+            } |> Some //Valid Passport
+        |(Some birthYear), 
+         (Some issueYear), 
+         (Some exYear), 
+         (Some height),
+         (Some hairColor),
+         (Some eyeColor),
+         (Some passID),
+         (None) -> 
+            {
+                ValidatedPassport.byr = birthYear
+                ValidatedPassport.iyr = issueYear
+                ValidatedPassport.eyr = exYear
+                ValidatedPassport.hgt = height
+                ValidatedPassport.hcl = hairColor
+                ValidatedPassport.ecl = eyeColor
+                ValidatedPassport.pid = passID
+                ValidatedPassport.cid = None
+            } |> Some //Hacked valid Passport
+        | _ , _ , _ , _ , _ , _ , _, _ -> None //Invalid Passport
 
     let solution1 =  
-                puzzleInput
-                |> convertinputToPassword
-                |> List.map checkPassport
-                |> List.countBy (fun passport -> passport.IsSome)                     
+        puzzleInput
+        |> convertinputToPassword
+        |> List.map checkPassport
+        |> List.countBy (fun passport -> passport.IsSome)
