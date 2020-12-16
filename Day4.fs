@@ -1,4 +1,4 @@
-// namespace AdventOfCode
+namespace AdventOfCode
 
 // module Excercise1 = 
 //     let text =
