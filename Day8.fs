@@ -48,27 +48,15 @@ module Excercise1 =
 
 module Solution1 =
     let puzzleInput = System.IO.File.ReadAllLines("./Puzzle8Input.txt")
-    let testdata =
-       [|
-           "nop +0";
-           "acc +1";
-           "jmp +4";
-           "acc +3";
-           "jmp -3";
-           "acc -99";
-           "acc +1";
-           "jmp -4";
-           "acc +6";
-       |]
 
     type Input =
-        |Nop of int
+        |Nop of int //number is not used
         |Acc of int
         |Jmp of int
     
     let mapInstructionToInput (instruction:string) =
         match instruction.Split " " |> fun commandAndValue -> commandAndValue.[0], int commandAndValue.[1] with
-        |"nop",num -> Nop num
+        |"nop",num -> Nop num 
         |"acc",num -> Acc num
         |"jmp",num -> Jmp num
         |_ -> Nop 0
@@ -96,24 +84,21 @@ module Solution1 =
         run 0 0 [] input
     
     let changeArrayAtIndexWithValue (array:Input array) (index,value) =
-        array
-        |> Array.indexed
-        |> Array.map (fun (indexArray, valueArray) -> if indexArray = (index - 1) then value else valueArray)
+        array |> Array.mapi (fun indexArray valueArray -> if indexArray = (index - 1) then value else valueArray)
 
     let program2 input permutations =
         permutations
         |> List.map (fun permutation ->
             match program1 (changeArrayAtIndexWithValue input permutation) with
-            |num, false -> None
+            |_, false -> None
             |num, true -> Some num)
         |> List.choose id
 
 
     let findNopOrJmpInstructions (input:Input array) =
         input
-        |> Array.indexed
-        |> Array.map (
-            fun (index,item) -> 
+        |> Array.mapi (
+            fun index item -> 
                 match item with
                 |Nop num -> Some (index + 1, Jmp num)
                 |Acc _ -> None
@@ -121,10 +106,6 @@ module Solution1 =
             )
         |> Array.choose id
         |> Array.toList
-        |> List.map (fun list -> 
-                                printfn "list = %s" (list.ToString())
-                                list)
-
 
     let solution1 =
         input puzzleInput
