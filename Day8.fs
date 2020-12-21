@@ -62,36 +62,75 @@ module Solution1 =
        |]
 
     type Input =
-        |Nop
+        |Nop of int
         |Acc of int
         |Jmp of int
     
     let mapInstructionToInput (instruction:string) =
         match instruction.Split " " |> fun commandAndValue -> commandAndValue.[0], int commandAndValue.[1] with
-        |"nop",_ -> Nop
+        |"nop",num -> Nop num
         |"acc",num -> Acc num
         |"jmp",num -> Jmp num
-        |_ -> Nop
+        |_ -> Nop 0
 
     let input data = 
         data
         |> Array.map mapInstructionToInput
     
-    let program (input: Input array) =
+    let program1 (input: Input array) =
         let rec run (accumulator:int) (currentPosition:int) (positionsVisited:int list) (input:Input array) =
             match input.[currentPosition], positionsVisited |> List.tryFind (fun item -> item = currentPosition) with
-            |Nop, None -> run accumulator (currentPosition + 1) (currentPosition::positionsVisited) input
-            |Acc num, None -> run (accumulator + num) (currentPosition + 1) (currentPosition::positionsVisited) input
-            |Jmp num, None -> run accumulator (currentPosition + num) (currentPosition::positionsVisited) input 
-            |_ , Some _ -> accumulator
+            |Nop _, None -> 
+                if currentPosition + 1 = input.Length 
+                then accumulator, true
+                else run accumulator (currentPosition + 1) (currentPosition::positionsVisited) input
+            |Acc num, None -> 
+                if currentPosition + 1 = input.Length
+                then accumulator + num, true
+                else run (accumulator + num) (currentPosition + 1) (currentPosition::positionsVisited) input
+            |Jmp num, None -> 
+                if currentPosition + num = input.Length
+                then accumulator, true
+                else run accumulator (currentPosition + num) (currentPosition::positionsVisited) input 
+            |_ , Some _ -> accumulator, false
         run 0 0 [] input
     
+    let changeArrayAtIndexWithValue (array:Input array) (index,value) =
+        array
+        |> Array.indexed
+        |> Array.map (fun (indexArray, valueArray) -> if indexArray = (index - 1) then value else valueArray)
+
+    let program2 input permutations =
+        permutations
+        |> List.map (fun permutation ->
+            match program1 (changeArrayAtIndexWithValue input permutation) with
+            |num, false -> None
+            |num, true -> Some num)
+        |> List.choose id
+
+
+    let findNopOrJmpInstructions (input:Input array) =
+        input
+        |> Array.indexed
+        |> Array.map (
+            fun (index,item) -> 
+                match item with
+                |Nop num -> Some (index + 1, Jmp num)
+                |Acc _ -> None
+                |Jmp _ -> Some (index + 1, Nop 0)
+            )
+        |> Array.choose id
+        |> Array.toList
+        |> List.map (fun list -> 
+                                printfn "list = %s" (list.ToString())
+                                list)
+
+
     let solution1 =
         input puzzleInput
-        |> program
-        
-
-        
-
-
+        |> program1
     
+    let solution2 =
+        input puzzleInput
+        |> findNopOrJmpInstructions
+        |> program2 (input puzzleInput)
