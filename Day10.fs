@@ -157,7 +157,30 @@ module Solution =
             |[] , _-> diff1 * (diff3 + 1)
         findDiff 0 0 0 inputList
 
+    let maptodifferenceList (input:int list) =
+        input
+        |> List.append [0]
+        |> List.pairwise
+        |> List.map (fun (item1,item2) -> item2 - item1)
+
+    let rec findGroups (of2,of3,of4) lastNumber numberSoFar input =
+        match input, lastNumber, numberSoFar with
+        |head::tail, 3, _ when head = 3 -> findGroups (of2,of3,of4) head 0 tail
+        |head::tail, 3, _ when head = 1 -> findGroups (of2,of3,of4) head 1 tail
+        |head::tail, 1, num when head = 1 -> findGroups (of2,of3,of4) head (num + 1) tail  
+        |head::tail, 1, num when head = 3 && num = 1 -> findGroups (of2,of3,of4) head 0 tail  
+        |head::tail, 1, num when head = 3 && num = 2 -> findGroups (of2 + 1, of3, of4) head 0 tail  
+        |head::tail, 1, num when head = 3 && num = 3 -> findGroups (of2, of3 + 1, of4) head 0 tail  
+        |head::tail, 1, num when head = 3 && num = 4 -> findGroups (of2, of3, of4 + 1) head 0 tail  
+        |head::_, 1, num when head = 3 && num > 4 -> failwithf "group of 1's of 5 found!"
+        |[], _ , _ -> pown 2. of2 * pown 4. of3 * pown 7. of4
+        |_ -> failwithf "this should not match" 
+
     let solution1 = 
         puzzleInput
         |> find1And3Differences
              
+    let solution2 = 
+        puzzleInput
+        |> maptodifferenceList
+        |> findGroups (0,0,0) 3 0 
