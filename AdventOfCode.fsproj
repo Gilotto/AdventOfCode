@@ -5,6 +5,7 @@
     <TargetFSharpCoreVersion>4.7.0</TargetFSharpCoreVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Day11.fs" />
     <Compile Include="Day1.fs" />
     <Compile Include="Day2.fs" />
     <Compile Include="Day3.fs" />
