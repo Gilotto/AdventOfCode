@@ -127,4 +127,21 @@ module Solution =
         |> List.concat
         |> Map.ofList
 
-    
+    let findAdjacentOccupiedSeats (map:Map<Coordinate,State>) (coordinate:Coordinate) =
+        let left = {coordinate with X = coordinate.X - 1}
+        let right = {coordinate with X = coordinate.X + 1}
+        let top = {coordinate with Y = coordinate.Y - 1}
+        let bottom = {coordinate with Y = coordinate.Y - 1}
+        let topLeft = {coordinate with X = coordinate.X - 1; Y = coordinate.Y - 1}
+        let topRight = {coordinate with X = coordinate.X + 1; Y = coordinate.Y - 1}
+        let bottomLeft = {coordinate with X = coordinate.X - 1; Y = coordinate.Y + 1}
+        let bottomRight = {coordinate with X = coordinate.X + 1; Y = coordinate.Y + 1}
+        [topLeft;top;topRight;right;bottomRight;bottom;bottomLeft;left]
+        |> List.map (fun coor -> map.TryGetValue coor)
+        |> List.map (fun (exists,state) -> if exists then Some state else None)
+        |> List.choose id
+        |> List.countBy (fun _ -> OccupiedSeat)
+        |> List.tryFind (fun (state,_) -> state = OccupiedSeat)
+        |> function 
+            |Some (_,num) -> num
+            |None -> 0
