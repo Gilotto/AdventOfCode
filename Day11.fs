@@ -93,7 +93,7 @@ namespace AdventOfCode
 
 module Solution =
     let puzzleInput = 
-        System.IO.File.ReadAllLines("./Puzzle10Input.txt")
+        System.IO.File.ReadAllLines("./Puzzle11Input.txt")
         |> Array.toList
         |> List.map (fun str -> 
             str.ToCharArray()
@@ -121,17 +121,20 @@ module Solution =
                 |_ -> failwithf "Illegal state found!")
                 |> fun seat -> mapLineToCoordinateAndSeat (index + 1, row) (seat::seatsSoFar) tail
 
-    let mapLineListToCoordinateAndSeat input =
+    let mapLineListToCoordinateAndSeatList input =
         input
         |> List.mapi (fun row line -> mapLineToCoordinateAndSeat (0,row) [] line)
         |> List.concat
+    
+    let inline mapListToCoordinateAndSeatMap list =
+        list
         |> Map.ofList
 
     let findAdjacentOccupiedSeats (map:Map<Coordinate,State>) (coordinate:Coordinate) =
         let left = {coordinate with X = coordinate.X - 1}
         let right = {coordinate with X = coordinate.X + 1}
         let top = {coordinate with Y = coordinate.Y - 1}
-        let bottom = {coordinate with Y = coordinate.Y - 1}
+        let bottom = {coordinate with Y = coordinate.Y + 1}
         let topLeft = {coordinate with X = coordinate.X - 1; Y = coordinate.Y - 1}
         let topRight = {coordinate with X = coordinate.X + 1; Y = coordinate.Y - 1}
         let bottomLeft = {coordinate with X = coordinate.X - 1; Y = coordinate.Y + 1}
@@ -140,8 +143,59 @@ module Solution =
         |> List.map (fun coor -> map.TryGetValue coor)
         |> List.map (fun (exists,state) -> if exists then Some state else None)
         |> List.choose id
-        |> List.countBy (fun _ -> OccupiedSeat)
+        |> List.countBy id
         |> List.tryFind (fun (state,_) -> state = OccupiedSeat)
         |> function 
-            |Some (_,num) -> num
-            |None -> 0
+            |Some (_,num) -> 
+                // printfn "number found: %i for coordinate %i,%i" num coordinate.X coordinate.Y
+                coordinate, num
+            |None -> coordinate, 0
+    
+    let updateSeatMapWithList (seatMap:Map<Coordinate,State>) coordinateAndNumberOfSeatsList =
+        let rec updateSeatMap (referenceSeatMap:Map<Coordinate,State>) updatedSeatList coordinateAndNumberOfSeatsList =
+            match coordinateAndNumberOfSeatsList with
+            |head::tail -> 
+                let ((coordinate:Coordinate),numberOfSeats) = head
+                match referenceSeatMap.Item coordinate, numberOfSeats with 
+                |Nothing, _ -> updateSeatMap referenceSeatMap ((coordinate,Nothing)::updatedSeatList) tail
+                |EmptySeat, 0 -> updateSeatMap referenceSeatMap ((coordinate,OccupiedSeat)::updatedSeatList) tail
+                |EmptySeat, _ -> updateSeatMap referenceSeatMap ((coordinate,EmptySeat)::updatedSeatList) tail
+                |OccupiedSeat, num when num >= 4 -> updateSeatMap referenceSeatMap ((coordinate, EmptySeat)::updatedSeatList) tail
+                |OccupiedSeat, num when num < 4 -> updateSeatMap referenceSeatMap ((coordinate, OccupiedSeat)::updatedSeatList) tail
+                |e -> failwithf "unexpected %s" (e.ToString())
+            |[] -> updatedSeatList, mapListToCoordinateAndSeatMap updatedSeatList
+        updateSeatMap seatMap List.empty coordinateAndNumberOfSeatsList
+
+    let changeSeats (seatList:(Coordinate * State) list) seatMap =
+        seatList
+        |> List.map fst
+        |> List.map (findAdjacentOccupiedSeats seatMap)
+        |> updateSeatMapWithList seatMap
+
+    let rec checkLists num (referenceList:(Coordinate * State) list) (newlist,newSeatmap) =
+        if (newlist |> List.sort) = (referenceList |> List.sort) || num > 9000
+        then 
+            printfn "number of rounds: %i" num
+            newlist
+        else checkLists (num + 1) newlist (changeSeats newlist newSeatmap)
+
+    let test = 
+        
+            ["L.LL.LL.LL";
+            "LLLLLLL.LL";
+            "L.L.L..L..";
+            "LLLL.LL.LL";
+            "L.LL.LL.LL";
+            "L.LLLLL.LL";
+            "..L.L.....";
+            "LLLLLLLLLL";
+            "L.LLLLLL.L";
+            "L.LLLLL.LL"]
+            |> List.map (fun str -> 
+            str.ToCharArray()
+            |> Array.toList) 
+        
+    let solution = 
+        checkLists 0 List.empty (mapLineListToCoordinateAndSeatList puzzleInput,mapListToCoordinateAndSeatMap (mapLineListToCoordinateAndSeatList puzzleInput))
+        |> List.map snd
+        |> List.countBy id
