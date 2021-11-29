@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <AssemblyName>AdventOfCode</AssemblyName>
+    <AssemblyName>AdventOfCode2020</AssemblyName>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <TargetFSharpCoreVersion>4.7.0</TargetFSharpCoreVersion>
   </PropertyGroup>
