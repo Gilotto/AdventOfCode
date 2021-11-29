@@ -1,0 +1,10 @@
+.ionide/symbolCache.db
+/obj/
+/bin/
+.fake
+.ionide
+.cache
+.json
+.props
+.targets
+obj/Debug/netcoreapp3.1/AdventOfCode.AssemblyInfo.fs
