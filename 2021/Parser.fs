@@ -10,6 +10,29 @@ module Parser =
         
     type Parser<'T> = Parser of (string -> ParseResult<'T * string>)
 
+    let run (Parser parser) input =
+        parser input
+
+    let bindP f (p:Parser<'a>) :Parser<'b>=
+        let innerFn input = 
+            let result1 = run p input
+            match result1 with
+            | Failure err ->
+                Failure err
+            | Success (value1,remainingInput) ->
+                let p2 = f value1
+                run p2 remainingInput
+        Parser innerFn
+
+    /// bindP
+    let ( >>= ) (p:Parser<'a>) f :Parser<'b>= bindP f p
+
+    let returnP (x:'a) :Parser<'a>=
+        let innerFn input =
+            Success (x, input)
+        Parser innerFn
+    
+
 
     let pchar charToMatch =
         let innerFn str =
@@ -26,63 +49,24 @@ module Parser =
                     Failure msg
         Parser innerFn
 
-    let run parser input =
-        let (Parser innerFn) = parser
-        innerFn input
+    let applyP fP xP =
+        fP >>= (fun f -> 
+        xP >>= (fun x ->
+            returnP (f x))) 
+    
+    /// applyP
+    let ( <*> ) = applyP
 
-    let andThen parser1 parser2 =
-        let innerFn input =
-            let result1 = run parser1 input
-            match result1 with
-            | Failure err -> 
-                Failure err
-            | Success (value1,remaining1) ->
-                let result2 = run parser2 remaining1
-                match result2 with
-                | Failure err ->
-                    Failure err
-                | Success (value2, remaining2) ->
-                    let newValue = value1,value2
-                    Success (newValue, remaining2)
-        Parser innerFn
+    let andThen p1 p2 =
+        p1 >>= (fun p1Result ->
+        p2 >>= (fun p2Result ->
+            returnP (p1Result,p2Result) ))
     
     /// andThen
     let ( .>>. ) = andThen
 
-    let orElse parser1 parser2 =
-        let innerFn input =
-            let result1 = run parser1 input
-            match result1 with
-            | Failure err -> 
-                let result2 = run parser2 input
-                result2
-
-            | Success result ->
-                result1
-
-        Parser innerFn
-    
-    /// orElse
-    let ( <|> ) = orElse
-
-    let choice listOfParsers =
-        List.reduce ( <|> ) listOfParsers 
-    
-    let anyOf listOfChars =
-        listOfChars
-        |> List.map pchar
-        |> choice
-    
-    let mapP f parser =
-        let innerFn input =
-            let result = run parser input
-            match result with
-            | Success (value, remaining) ->
-                let newValue = f value
-                Success (newValue, remaining)
-            | Failure err ->
-                Failure err
-        Parser innerFn
+    let mapP f =
+        bindP (f >> returnP)
     
     /// mapP
     let ( <!> ) = mapP
@@ -99,22 +83,34 @@ module Parser =
         p1 .>>. p2
         |> mapP snd
 
-    let returnP x =
+
+
+    let orElse parser1 parser2 =
         let innerFn input =
-            Success (x, input)
+            let result1 = run parser1 input
+            match result1 with
+            | Failure err -> 
+                let result2 = run parser2 input
+                result2
+            | Success result ->
+                result1
         Parser innerFn
     
-    let opt p =
+    /// orElse
+    let ( <|> ) = orElse
+
+    let opt (p:Parser<'a>) :Parser<'a option>=
         let some = p |>> Some
         let none = returnP None
-        some <|> none    
+        some <|> none  
 
-    let applyP fP xP =
-        (fP .>>. xP)
-        |> mapP (fun (f,x) -> f x )
+    let choice listOfParsers =
+        List.reduce ( <|> ) listOfParsers 
     
-    /// applyP
-    let ( <*> ) = applyP
+    let anyOf listOfChars =
+        listOfChars
+        |> List.map pchar
+        |> choice
 
     let lift2 f xP yP =
         returnP f <*> xP <*> yP
@@ -165,18 +161,10 @@ module Parser =
             Success (parseZeroOrMore parser input)
         Parser innerFn
 
-    let many1 parser =
-        let innerFn input =
-            let firstResult = run parser input
-            match firstResult with
-            | Failure err ->
-                Failure err
-            | Success (firstValue, inputAfterFirstParse) ->
-                let (subsequentValues,remainingInput) =
-                    parseZeroOrMore parser inputAfterFirstParse
-                let values = firstValue::subsequentValues
-                Success (values,remainingInput)
-        Parser innerFn
+    let many1 p =
+        p      >>= (fun head ->
+        many p >>= (fun tail ->
+            returnP (head::tail) ))
 
     let pint =
         let resultToInt (sign,charList) = 
@@ -202,16 +190,3 @@ module Parser =
     let sepBy p sep =
         sepBy1 p sep <|> returnP []
 
-    let bindP f p =
-        let innerFn input = 
-            let result1 = run p input
-            match result1 with
-            | Failure err ->
-                Failure err
-            | Success (value1,remainingInput) ->
-                let p2 = f value1
-                run p2 remainingInput
-        Parser innerFn
-
-    /// bindP
-    let ( >>= ) p f = bindP f p
