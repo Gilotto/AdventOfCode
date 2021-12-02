@@ -2,7 +2,6 @@ namespace AdventOfCode
 
 open System
 open Parser
-open Day01
 module main =
 
     // module TestValues =
@@ -45,9 +44,8 @@ module main =
 
     [<EntryPoint>]
     let main argv =
-        printfn "%i" solution01_part02
-        
-        // TestValues.tests
-        // |> List.map (ParseSettings.parserSettings |> run)
-        // |> List.iter (printfn "%A")
+        printfn "Day1 Part 1: %s\n" Day01.solutionPart1
+        printfn "Day1 Part 2: %s\n" Day01.solutionPart2
+        printfn "Day2 Part 1: %A\n" Day02.solutionPart1
+        printfn "Day1 Part 2: %A\n" Day02.solutionPart2
         0 // return an integer exit code

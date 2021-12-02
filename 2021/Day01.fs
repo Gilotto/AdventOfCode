@@ -48,17 +48,32 @@ module Day01 =
 // How many measurements are larger than the previous measurement?
 
 // To begin, get your puzzle input.
-    open System.IO
+    
     open Parser
 
+    let inputLocation = "./input/day01part01.txt"
+    
+    let parseInput input =
+        input 
+        |> List.map (pint |> run)
+        |> List.map mapToResult
+        |> Result.sequence
 
-    let solution01_part01 =
-        File.ReadAllLines("./input/day01part01.txt")
-        |> Array.map (pint |> run)
-        |> Array.pairwise
-        |> Array.choose (fun (num1,num2) -> if num2 > num1 then Some 1 else None)
-        |> Array.reduce (+)
 
+    let countHigherThanLast inputRes =
+        inputRes
+        |> Result.map (fun list -> 
+            list
+            |> List.pairwise
+            |> List.choose (fun (num1,num2) -> if num2 > num1 then Some 1 else None)
+            |> List.reduce (+)
+        )
+
+    let solutionPart1 = 
+        IO.readInput inputLocation
+        |> parseInput
+        |> countHigherThanLast
+        |> sprintf "The answer is: %A"
 // --- Part Two ---
 
 // Considering every single measurement isn't as useful as you expected: there's just too much noise in the data.
@@ -95,17 +110,16 @@ module Day01 =
 
 // Consider sums of a three-measurement sliding window. How many sums are larger than the previous sum?
 
+    let windowListToThreeAndSum inputRes =
+        inputRes
+        |> Result.map (fun list ->
+            list
+            |> List.windowed 3
+            |> List.map (List.reduce (+)))
 
-    let solution01_part02 =
-        File.ReadAllLines("./input/day01part01.txt")
-        |> Array.map (pint |> run)
-        |> Array.windowed 3
-        |> Array.map (
-            Array.reduce (
-                fun res1 res2 ->    
-                    match res1,res2 with 
-                    |Success (number1,_), Success (number2,_) -> ((number1 + number2),"") |> Success
-                    | _ -> failwithf "parsed incorrectly"))
-        |> Array.pairwise
-        |> Array.choose (fun (num1,num2) -> if num2 > num1 then Some 1 else None)
-        |> Array.reduce (+)
+    let solutionPart2 = 
+        IO.readInput inputLocation
+        |> parseInput
+        |> windowListToThreeAndSum
+        |> countHigherThanLast
+        |> sprintf "The answer is: %A"

@@ -13,6 +13,10 @@ module Parser =
     let run (Parser parser) input =
         parser input
 
+    let mapToResult = function
+        |Success (value,_) -> Ok value
+        |Failure err -> Error err
+
     let bindP f (p:Parser<'a>) :Parser<'b>=
         let innerFn input = 
             let result1 = run p input
