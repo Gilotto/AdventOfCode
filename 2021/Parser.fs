@@ -35,8 +35,6 @@ module Parser =
         let innerFn input =
             Success (x, input)
         Parser innerFn
-    
-
 
     let pchar charToMatch =
         let innerFn str =
@@ -86,8 +84,6 @@ module Parser =
     let ( >>. ) p1 p2 =
         p1 .>>. p2
         |> mapP snd
-
-
 
     let orElse parser1 parser2 =
         let innerFn input =
@@ -174,7 +170,7 @@ module Parser =
         let resultToInt (sign,charList) = 
             let i = charList |> List.toArray |> System.String |> int //can overflow!
             match sign with
-            | Some ch -> -i
+            | Some _ -> -i
             | None -> i
         
         let digit = anyOf ['0'..'9']
@@ -194,3 +190,15 @@ module Parser =
     let sepBy p sep =
         sepBy1 p sep <|> returnP []
 
+    let pfloat =
+        let resultToFloat ((sign,digits1),digits2) =
+            let fl = sprintf "%s.%s" (digits1|> charListToStr) (digits2|> charListToStr) |> float
+            match sign with
+            |Some _ -> -fl
+            |None -> fl
+        
+        let digit = anyOf ['0'..'9']
+        let digits = many1 digit
+
+        opt (pchar '-') .>>. digits .>> pchar '.' .>>. digits
+        |> mapP resultToFloat
