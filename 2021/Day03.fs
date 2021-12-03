@@ -45,9 +45,12 @@ module Day03 =
         |> List.transpose
         |> List.map (List.countBy id)
         |> List.map (
-            fun list ->
-                match list.[0] , list.[1] with
-                |(char1, number1),(char2,number2) -> if number1 > number2 then char1,char2 else char2, char1)
+            fun list -> 
+                match list.[0] , list.[1] with 
+                (char1, number1),(char2,number2) -> 
+                    if number1 > number2 
+                    then char1, char2 
+                    else char2, char1)
         |> List.unzip
         |> fun (mostCommonList,leastCommonList) -> 
             [mostCommonList; leastCommonList] 
@@ -137,7 +140,7 @@ module Day03 =
             | Ok mostCommonList,Ok leastCommonList -> 
                 [mostCommonList; leastCommonList] 
                 |> List.map (fun str -> Convert.ToInt32(str,2))
-                |> fun list -> sprintf "The answer is: oxygen generator rate: %i; CO2 scrubber rate: %i; power consumption: %i" list.[0] list.[1] (list.[0] * list.[1])
+                |> fun list -> sprintf "The answer is: oxygen generator rate: %i; CO2 scrubber rate: %i; life support rating: %i" list.[0] list.[1] (list.[0] * list.[1])
             | Error err1, Error err2 -> sprintf "%s; %s" err1 err2
             | Error err, _
             | _ , Error err -> sprintf "%s" err
