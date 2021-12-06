@@ -36,7 +36,6 @@ module Day03 =
 
 // Use the binary numbers in your diagnostic report to calculate the gamma rate and epsilon rate, then multiply them together. What is the power consumption of the submarine? (Be sure to represent your answer in decimal, not binary.)
     open System
-    open System.Numerics
     let inputLocation = "./input/day03.txt"
 
     let solutionPart1 =
