@@ -54,4 +54,6 @@ module main =
         printfn "Day4 Part 2: %s\n" Day04.solutionPart2
         printfn "Day5 Part 1: %s\n" Day05.solutionPart1
         printfn "Day5 Part 2: %s\n" Day05.solutionPart2
+        printfn "Day6 Part 1: %A\n" Day06.solutionPart1
+        // printfn "Day6 Part 2: %A\n" Day06.solutionPart2
         0 // return an integer exit code
