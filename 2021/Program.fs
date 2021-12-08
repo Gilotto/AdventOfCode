@@ -44,18 +44,20 @@ module main =
 
     [<EntryPoint>]
     let main argv =
-        printfn "Day1 Part 1: %s\n" Day01.solutionPart1
-        printfn "Day1 Part 2: %s\n" Day01.solutionPart2
-        printfn "Day2 Part 1: %A\n" Day02.solutionPart1
-        printfn "Day2 Part 2: %A\n" Day02.solutionPart2
-        printfn "Day3 Part 1: %A\n" Day03.solutionPart1
-        printfn "Day3 Part 2: %A\n" Day03.solutionPart2
-        printfn "Day4 Part 1: %s\n" Day04.solutionPart1
-        printfn "Day4 Part 2: %s\n" Day04.solutionPart2
-        printfn "Day5 Part 1: %s\n" Day05.solutionPart1
-        printfn "Day5 Part 2: %s\n" Day05.solutionPart2
-        printfn "Day6 Part 1: %A\n" Day06.solutionPart1
+        // printfn "Day1 Part 1: %s\n" Day01.solutionPart1
+        // printfn "Day1 Part 2: %s\n" Day01.solutionPart2
+        // printfn "Day2 Part 1: %A\n" Day02.solutionPart1
+        // printfn "Day2 Part 2: %A\n" Day02.solutionPart2
+        // printfn "Day3 Part 1: %A\n" Day03.solutionPart1
+        // printfn "Day3 Part 2: %A\n" Day03.solutionPart2
+        // printfn "Day4 Part 1: %s\n" Day04.solutionPart1
+        // printfn "Day4 Part 2: %s\n" Day04.solutionPart2
+        // printfn "Day5 Part 1: %s\n" Day05.solutionPart1
+        // printfn "Day5 Part 2: %s\n" Day05.solutionPart2
+        // printfn "Day6 Part 1: %A\n" Day06.solutionPart1
         // printfn "Day6 Part 2: %A\n" Day06.solutionPart2
-        printfn "Day7 Part 1: %A\n" Day07.solutionPart1
-        printfn "Day7 Part 2: %A\n" Day07.solutionPart2
+        // printfn "Day7 Part 1: %A\n" Day07.solutionPart1
+        // printfn "Day7 Part 2: %A\n" Day07.solutionPart2
+        printfn "Day8 Part 1: %A\n" (Day08.solutionPart1 ())
+        printfn "Day8 Part 2: %A\n" (Day08.solutionPart2 ())
         0 // return an integer exit code
