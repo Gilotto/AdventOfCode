@@ -60,4 +60,5 @@ module main =
         // printfn "Day7 Part 2: %A\n" Day07.solutionPart2
         printfn "Day8 Part 1: %A\n" (Day08.solutionPart1 ())
         printfn "Day8 Part 2: %A\n" (Day08.solutionPart2 ())
+        printfn "Day9 Part 1: %A\n" (Day09.solutionPart1 )
         0 // return an integer exit code
