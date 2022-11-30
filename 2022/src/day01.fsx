@@ -1,5 +1,5 @@
 #load "./parser.fsx"
 
-open AdventOfCode.Parser
+open Parser
 
 let day01_part1 = ""
