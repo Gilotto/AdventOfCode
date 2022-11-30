@@ -8,3 +8,6 @@
 .props
 .targets
 obj/Debug/netcoreapp3.1/AdventOfCode.AssemblyInfo.fs
+2022/.paket/
+2022/packages/
+2022/packages/
