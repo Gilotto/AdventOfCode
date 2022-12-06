@@ -45,7 +45,6 @@ data
 |> List.map (fun str -> 
     match String.length str with
         |i when i % 2 = 0 -> 
-            printfn "%s - %s - %s" str (str.Substring(0,i/2)) (str.Substring(i / 2, i / 2))
             str.Substring(0,i/2)
             |> String.filter (fun ch -> 
                 str.Substring(i / 2, i / 2) |> String.exists (fun c -> c = ch ) 
