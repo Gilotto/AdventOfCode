@@ -228,7 +228,7 @@ directories
 |> List.sort
 |> fun ( ls: float list ) -> 
     let spaceInUse = ( ls |> List.last )
-    let currentFreeSpace = (70000000. - ( ls |> List.last ))
+    let currentFreeSpace = 70000000. - spaceInUse
     let freeSpaceNeeded = 30000000. - currentFreeSpace
     printfn "The current disk space in use is: %0.0f" spaceInUse
     printfn "The current free space is: %0.0f" ( 70000000. - ( ls |> List.last ))
