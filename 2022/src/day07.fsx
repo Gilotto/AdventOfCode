@@ -231,6 +231,6 @@ directories
     let currentFreeSpace = 70000000. - spaceInUse
     let freeSpaceNeeded = 30000000. - currentFreeSpace
     printfn "The current disk space in use is: %0.0f" spaceInUse
-    printfn "The current free space is: %0.0f" ( 70000000. - ( ls |> List.last ))
+    printfn "The current free space is: %0.0f" currentFreeSpace
     printfn "Extra space needed: %0.0f" freeSpaceNeeded
     printfn "The closest size of the dir is %0.0f" ( List.find ( fun f -> f >= freeSpaceNeeded ) ls)
